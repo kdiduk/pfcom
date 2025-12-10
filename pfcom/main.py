@@ -1,15 +1,27 @@
 from pathlib import Path
 
-def list_current_directory():
-    path = Path.cwd()
-    print(f"Содержимое директории {path.name}\n")
-    for item in path.iterdir():
-        if item.is_dir():
-            print(f"/{item.name}")
-        else:
-            print(f"{item.name}")
+from textual.app import App, ComposeResult
+from textual.widgets import DataTable
+
+
+class PFComApp(App):
+
+    def compose(self) -> ComposeResult:
+        yield DataTable(id="file_table")
+    
+    def on_mount(self) -> None:
+        self.file_table = self.query_one("#file_table", DataTable)
+        path = Path.cwd()
+        self.file_table.add_column(f"Содержимое папки {path.name}")
+        for item in path.iterdir():
+            if item.is_dir():
+                self.file_table.add_row(f"/{item.name}")
+            else:
+                self.file_table.add_row(item.name)    
+
 
 if __name__ == "__main__":
-    list_current_directory()
+    app = PFComApp()
+    app.run()
 
 # EOF
